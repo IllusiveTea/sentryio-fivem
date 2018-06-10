@@ -37,7 +37,7 @@ Citizen.CreateThread(function()
 	end
 
 	local function GenerateUUID()
-		return string.format("%s4%s8%s%s", RandomHex(10), RandomHex(5), RandomHex(2), RandomHex(13))
+		return string.format("%s6%s2%s%s", RandomHex(10), RandomHex(5), RandomHex(2), RandomHex(13))
 	end
 
 	local function GetTimestamp()
