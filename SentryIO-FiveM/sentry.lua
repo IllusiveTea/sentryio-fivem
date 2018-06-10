@@ -9,7 +9,6 @@ Citizen.CreateThread(function()
 		projectid = GetConvar("SentryIO_ProjectId", "none")
 	}
 
-	Citizen.Wait(5000)
 	print("["..GetCurrentResourceName().."]: Checking Convars...")
 	allgood = true
 
@@ -31,6 +30,7 @@ Citizen.CreateThread(function()
 	local function RandomHex(length)
 		local s = ""
 		for i = 1, length do
+			math.randomseed(os.clock()^5)
 			s = s..hextable[math.random(1,16)]
 		end
 		return s
