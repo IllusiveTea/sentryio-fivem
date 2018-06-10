@@ -107,6 +107,31 @@ Citizen.CreateThread(function()
 	function SentryIO_Debug(debugType, debug)
 		SentryIO:Issue(debugType, debug, "debug")
 	end
+
+	RegisterNetEvent("SentryIO_Fatal")
+	AddEventHandler("SentryIO_Fatal", function(fatalType, fatal)
+		SentryIO:Issue(fatalType, fatal, "fatal")
+	end)
+
+	RegisterNetEvent("SentryIO_Error")
+	AddEventHandler("SentryIO_Error", function(errorType, error)
+		SentryIO:Issue(errorType, error, "error")
+	end)
+
+	RegisterNetEvent("SentryIO_Warning")
+	AddEventHandler("SentryIO_Warning", function(warningType, warning)
+		SentryIO:Issue(warningType, warning, "warning")
+	end)
+
+	RegisterNetEvent("SentryIO_Info")
+	AddEventHandler("SentryIO_Info", function(infoType, info)
+		SentryIO:Issue(infoType, info, "info")
+	end)
+
+	RegisterNetEvent("SentryIO_Debug")
+	AddEventHandler("SentryIO_Debug", function(debugType, debug)
+		SentryIO:Issue(debugType, debug, "debug")
+	end)
 end)
 
 local verFile = LoadResourceFile(GetCurrentResourceName(), "version.json")
@@ -115,10 +140,8 @@ Citizen.CreateThread(function()
 	local updatePath = "/IllusiveTea/sentryio-fivem"
 	local resourceName = "SentryIO-FiveM ("..GetCurrentResourceName()..")"
 	function CheckForUpdate()
-		PerformHttpRequest("https://raw.githubusercontent.com"..updatePath.."/master/version.json", function(err, response, headers)
+		PerformHttpRequest("https://raw.githubusercontent.com"..updatePath.."/master/SentryIO-FiveM/version.json", function(err, response, headers)
 			local data = json.decode(response)
-
-
 			if curVersion ~= data.version and tonumber(curVersion) < tonumber(data.version) then
 				print("\n--------------------------------------------------------------------------")
 				print("\n"..resourceName.." is outdated.\nCurrent Version: "..data.version.."\nYour Version: "..curVersion.."\nPlease update it from https://github.com"..updatePath.."")
@@ -133,5 +156,5 @@ Citizen.CreateThread(function()
 		SetTimeout(3600000, CheckForUpdate)
 	end
 
-	CheckForUpdate()
+	SetTimeout(2500, CheckForUpdate)
 end)
