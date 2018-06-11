@@ -6,24 +6,9 @@ Citizen.CreateThread(function()
 	SentryConfig = {
 		publickey = GetConvar("SentryIO_PublicKey", "none"),
 		privkey = GetConvar("SentryIO_PrivKey", "none"),
-		projectid = GetConvar("SentryIO_ProjectId", "none")
+		projectid = GetConvar("SentryIO_ProjectId", "none"),
+		webhook = GetConvar("SentryIO_DiscordWebhook", "none")
 	}
-
-	print("["..GetCurrentResourceName().."]: Checking Convars...")
-	allgood = true
-
-	for k,v in pairs(SentryConfig) do
-		if v == "none" then
-			print("["..GetCurrentResourceName().."]: "..k.." is missing from your cfg, this is required for this resource to work!")
-			enabled = false
-			error(k.." is missing from your cfg, this are required for this resource to work!")
-			allgood = false
-		end
-	end
-
-	if allgood then
-		print("["..GetCurrentResourceName().."]: Is setup correctly, enjoy!")
-	end
 
 	local hextable = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 'a', 'b', 'c', 'd', 'e', 'f'}
 
@@ -74,6 +59,26 @@ Citizen.CreateThread(function()
 			        print("An error occured, Status Code: "..statusCode..", Message: "..data)
 			    end
 			end, 'POST', json.encode(data), headers)
+
+			if SentryConfig.webhook ~= "none" then
+				local embeds = {
+				    {
+				        ["title"] = errorType,
+						["description"] = error,
+				        ["color"] = 31743,
+				        ["footer"] =  {
+							["icon_url"] = "https://sentry-brand.storage.googleapis.com/sentry-glyph-white.png",
+				            ["text"] = "SentryIO-FiveM",
+				        },
+				    }
+				}
+
+				PerformHttpRequest(SentryConfig.webhook, function(statusCode, text, headers)
+			    	if text then
+			        	print(text)
+			    	end
+				end, 'POST', json.encode({ avatar_url = "https://sentry-brand.storage.googleapis.com/sentry-glyph-white.png", username = "SentryIO-FiveM", embeds = embeds}), { ["Content-Type"] = 'application/json' })
+			end
 		end
 	end
 
