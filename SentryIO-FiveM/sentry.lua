@@ -34,7 +34,7 @@ Citizen.CreateThread(function()
 		if enabled then
 			local data = {
 				["event_id"] = GenerateUUID(),
-				["timestamp"] = os.date("!%Y-%m-%dT%TZ"),
+				["timestamp"] = os.date("!%Y-%m-%dT%H:%M:%SZ"),
 				["logger"] = "FiveM.Logger",
 				["platform"] = "other",
 				["sdk"] = {
