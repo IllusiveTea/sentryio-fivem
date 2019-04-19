@@ -51,59 +51,64 @@ Citizen.CreateThread(function()
 			local headers = {
 				["Content-Type"] = 'application/json',
 				["User-Agent"] = 'raven-Lua/1.0',
+				["Authorization"] = "DSN "..SentryConfig.publickey,
 				["X-Sentry-Auth"] = 'Sentry sentry_version=7,sentry_timestamp='..os.time()..',sentry_key='..SentryConfig.publickey..',sentry_secret='..SentryConfig.privkey..',sentry_client=raven-Lua/1.0'
 			}
 
 			PerformHttpRequest('https://sentry.io/api/'..SentryConfig.projectid..'/store/', function(statusCode, data, headers)
-			    if statusCode ~= 200 then
-			        print("An error occured, Status Code: "..statusCode..", Message: "..data)
-			    end
+				if statusCode ~= 200 then
+					print("An error occured, Status Code: "..statusCode)
+					print(data)
+					print("Error occured, waiting to retry...")
+					Wait(2000)
+					--SentryIO:Issue(errorType, error, severity)
+				end
 			end, 'POST', json.encode(data), headers)
 
 			if SentryConfig.webhook ~= "none" then
 				local embeds = {
-				    {
-				        ["title"] = errorType,
+					{
+						["title"] = errorType,
 						["description"] = error,
-				        ["color"] = 31743,
-				        ["footer"] =  {
+						["color"] = 31743,
+						["footer"] =  {
 							["icon_url"] = "https://sentry-brand.storage.googleapis.com/sentry-glyph-white.png",
-				            ["text"] = "SentryIO-FiveM",
-				        },
-				    }
+							["text"] = "SentryIO-FiveM",
+						},
+					}
 				}
 
 				PerformHttpRequest(SentryConfig.webhook, function(statusCode, text, headers)
-			    	if text then
-			        	print(text)
-			    	end
+					if text then
+						print(text)
+					end
 				end, 'POST', json.encode({ avatar_url = "https://sentry-brand.storage.googleapis.com/sentry-glyph-white.png", username = "SentryIO-FiveM", embeds = embeds}), { ["Content-Type"] = 'application/json' })
 			end
 		end
 	end
 
-	RegisterNetEvent("SentryIO_Fatal")
-	AddEventHandler("SentryIO_Fatal", function(fatalType, fatal)
+	RegisterNetEvent("SentryIO:Fatal")
+	AddEventHandler("SentryIO:Fatal", function(fatalType, fatal)
 		SentryIO:Issue(fatalType, fatal, "fatal")
 	end)
 
-	RegisterNetEvent("SentryIO_Error")
-	AddEventHandler("SentryIO_Error", function(errorType, error)
+	RegisterNetEvent("SentryIO:Error")
+	AddEventHandler("SentryIO:Error", function(errorType, error)
 		SentryIO:Issue(errorType, error, "error")
 	end)
 
-	RegisterNetEvent("SentryIO_Warning")
-	AddEventHandler("SentryIO_Warning", function(warningType, warning)
+	RegisterNetEvent("SentryIO:Warning")
+	AddEventHandler("SentryIO:Warning", function(warningType, warning)
 		SentryIO:Issue(warningType, warning, "warning")
 	end)
 
-	RegisterNetEvent("SentryIO_Info")
-	AddEventHandler("SentryIO_Info", function(infoType, info)
+	RegisterNetEvent("SentryIO:Info")
+	AddEventHandler("SentryIO:Info", function(infoType, info)
 		SentryIO:Issue(infoType, info, "info")
 	end)
 
-	RegisterNetEvent("SentryIO_Debug")
-	AddEventHandler("SentryIO_Debug", function(debugType, debug)
+	RegisterNetEvent("SentryIO:Debug")
+	AddEventHandler("SentryIO:Debug", function(debugType, debug)
 		SentryIO:Issue(debugType, debug, "debug")
 	end)
 end)
@@ -130,5 +135,5 @@ Citizen.CreateThread(function()
 		SetTimeout(3600000, CheckForUpdate)
 	end
 
-	SetTimeout(2500, CheckForUpdate)
+	CheckForUpdate()
 end)
